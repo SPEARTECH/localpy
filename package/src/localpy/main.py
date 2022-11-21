@@ -1,5 +1,5 @@
 '''
-Local String Encryption Tool v1.0.3
+Local String Encryption Tool v1.0.4
 '''
 
 from ast import Continue
@@ -48,11 +48,11 @@ def gen_main_secret():
         f.write(Fernet(KEY).encrypt(password).decode())
 
     print('Success! \n**Encrypted password created in "master_secret.txt"**\n')
-    print('----\/Key for decrypting\/----')
-    print(KEY.decode())
-    print('----/\Key for decrypting/\----\n')
-    pyperclip.copy(KEY.decode())
-    print('**Key copied to clipboard successfully**\nKeep your key in a safe place and use for decrypting this program...')
+    # print('----\/Key for decrypting\/----')
+    # print(KEY.decode())
+    # print('----/\Key for decrypting/\----\n')
+    # pyperclip.copy(KEY.decode())
+    # print('**Key copied to clipboard successfully**\nKeep your key in a safe place and use for decrypting this program...')
     datetimestamp = datetime.now()
     with open('history.txt', 'a+') as f:
         f.write(f'{datetimestamp}: {os.getlogin()} generated master password\n')
@@ -83,13 +83,7 @@ def authenticate():
     ### ###
 
     KEY = key
-    print(password.decode())
-    print('printing key:')
-    print(key)
-    print(Fernet(key).decrypt(encrypted_password).decode())
-    # print(encrypted_password)
-    # print(password.decode())
-    # print(Fernet(key).decrypt(encrypted_password).decode())
+
     if password.decode() == Fernet(key).decrypt(encrypted_password).decode():
         datetimestamp = datetime.now()
         with open('history.txt', 'a+') as f:
