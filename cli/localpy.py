@@ -35,7 +35,7 @@ def gen_main_secret():
     # replaced above random key generation with a static salted key gen so only a password is required (v1.0.2 -> v1.0.3)
     SALT = b'\xcdS:\x80\xdc\x8b)\x90IT\xd5\xbb\x93\x80\xc2\xd8'
     kdf = PBKDF2HMAC(
-        algorithm=hashes.SHA256,
+        algorithm=hashes.SHA256(),
         length=32,
         salt=SALT,
         iterations=100000,
@@ -73,7 +73,7 @@ def authenticate():
     # replaced above key requirement with static salt generated key so only a password is required (v1.0.2 -> v1.0.3)
     SALT = b'\xcdS:\x80\xdc\x8b)\x90IT\xd5\xbb\x93\x80\xc2\xd8'
     kdf = PBKDF2HMAC(
-        algorithm=hashes.SHA256,
+        algorithm=hashes.SHA256(),
         length=32,
         salt=SALT,
         iterations=100000,
@@ -115,7 +115,8 @@ def search():
         print('\nResults:\n--------')
         with open('secrets.txt', 'r') as f:
             for line in f.readlines():
-                print(line.split('=', 1)[0])
+                if len("".join(line.split())) > 0:
+                    print(line.split('=', 1)[0])
         print('--------\n')
         print('**No input, returned all entries.**')
 
@@ -246,7 +247,7 @@ def clear_clipboard():
     print('\n**Clipboard clear...**')
 
 # main function run with password login
-def run():
+def main():
     if not os.path.exists('history.txt'):
         open('history.txt', 'w')
 
@@ -257,7 +258,6 @@ def run():
 
     if not os.path.exists('secrets.txt'):
         open('secrets.txt', 'w')
-
 
     status, key = authenticate()
     while True:
@@ -317,5 +317,5 @@ Commands:
 
 
 if __name__ == '__main__':
-    run()
+    main()
 

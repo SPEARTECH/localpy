@@ -1,0 +1,45 @@
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "localpy"
+version = "1.0.5"
+authors = [
+{ name="Speartech", email="Tyler@Speartech.org" },
+]
+description = "A commandline tool for storing passwords safely on your computer."
+readme = "README.md"
+requires-python = ">=3.11"
+classifiers = [
+"Programming Language :: Python :: 3",
+"License :: OSI Approved :: MIT License",
+"Operating System :: OS Independent",
+]
+
+# Add your dependencies here
+dependencies = [
+"cffi==1.15.1",
+"cryptography==38.0.3",
+"pycparser==2.21",
+"pyperclip==1.8.2",
+"requests==2.28.1",
+"urllib3==1.26.12"
+]
+
+[project.urls]
+Homepage = "https://github.com/pypa/sampleproject"
+Issues = "https://github.com/pypa/sampleproject/issues"
+
+
+# Specify the directory where your Python package code is located
+[tool.hatch.build.targets.sdist]
+include = ["*"]
+
+[tool.hatch.build.targets.wheel]
+include = ["*"]
+
+# Define entry points for CLI
+[project.scripts]
+localpy = "localpy.__main__:main"
