@@ -98,58 +98,38 @@ def authenticate():
 #search function, search unencrypted secret keys and return the matches
 def search():
     query = input('Enter your search: ')
-    entries = {}
     lines = []
     if len(query) != 0:
         with open('secrets.txt', 'r') as f:
             for line in f.readlines():
-                if query.lower() in line.split('=', 1)[0].lower():
+                if query in line.split('=', 1)[0]:
                     lines.append(line)
         if len(lines) == 0:
                 print('No match found...')
         else:
             print('\nResults:\n--------')
-            count = 1
             for line in lines:
-                entries[count] = line.split('=', 1)[0]
-                print(str(count)+')\t'+line.split('=', 1)[0])
-                count += 1
-                # print(entries)
+                print(line.split('=', 1)[0])
             print('--------\n')
     else:
         print('\nResults:\n--------')
         with open('secrets.txt', 'r') as f:
-            count = 1
             for line in f.readlines():
                 if len("".join(line.split())) > 0:
-                    entries[count] = line.split('=', 1)[0]
-                    print(str(count)+')\t'+line.split('=', 1)[0])
-                    count += 1
-                    # print(entries)
+                    print(line.split('=', 1)[0])
         print('--------\n')
         print('**No input, returned all entries.**')
-    return entries
 
 # select desired secret by key (must be a match)
-def decrypt(key,entries):
+def decrypt(key):
     query = input('Enter your selection: ')
     lines = []
     # key = bytes(input('Paste your key: ').encode('utf-8'))
     if len(query) != 0:
         with open('secrets.txt', 'r') as f:
-            if "".join(query.split()).isdigit():
-                if int("".join(query.split())) in entries.keys():
-                    for line in f.readlines():
-                        if entries[int("".join(query.split()))] == line.split('=', 1)[0]:
-                            lines.append(line)
-                else:
-                    print('**Selection out of range. Search for a valid number...**')
-                    return entries
-            else:
-                for line in f.readlines():
-                    if query == line.split('=', 1)[0]:
-                        lines.append(line)
-                
+            for line in f.readlines():
+                if query == line.split('=', 1)[0]:
+                    lines.append(line)
         if len(lines) > 1:
             print('\nResults:\n--------\n')
             for line in lines:
@@ -174,38 +154,31 @@ def decrypt(key,entries):
     else:
         print('\nResults:\n--------')
         with open('secrets.txt', 'r') as f:
-            count = 1
             for line in f.readlines():
-                entries[count] = line.split('=', 1)[0]
-                print(str(count)+')\t'+line.split('=', 1)[0])
-                count =+ 1
+                print(line.split('=', 1)[0])
         print('--------')
         print('\n**No selection specified. Please try again...**')
-    return entries
 
 # add desired secret (key must be unique)
 def add(key):
     while True:
-        entries = {}
         title = input('Enter the title of your new secret: ')
         if '=' in title:
             title = input('\n**Error: Cannot have "=" in the title**\nPlease enter a new title for your secret: ')
             continue
         else:
             with open('secrets.txt', 'r') as f:
-                count = 1
                 for line in f.readlines():
                     if title.lower() == line.lower().split('=', 1)[0]:
-                        entries[count] = line.split('=', 1)[0]
                         print('\nResults:\n--------')
-                        print(str(count)+')\t'+line.split('=', 1)[0])
+                        print(line.split('=', 1)[0])
                         print('--------')
-                        count += 1
 
                         title = input('\n**Error: An entry with that title already exists**\nPlease enter a new title for your secret: ')    
                         Continue
                 secret = bytes(getpass.getpass('Enter your new secret: ').encode('utf-8'))
                 break
+
 
     # password = PASSWORD
     # print(password)
@@ -224,7 +197,6 @@ def add(key):
     datetimestamp = datetime.now()
     with open('history.txt', 'a+') as f:
         f.write(f'{datetimestamp}: {os.getlogin()} added {title}={str(encrypted_secret.decode())}\n')
-    return entries
 
 # delete an entry
 def delete():
@@ -276,7 +248,6 @@ def clear_clipboard():
 
 # main function run with password login
 def main():
-    entries = {}
     if not os.path.exists('history.txt'):
         open('history.txt', 'w')
 
@@ -296,11 +267,11 @@ def main():
 Commands:
 \t1) search\t\tSearch secrets
 \t2) decrypt\t\tDecrypt secret
-\t3) add\t\t\tAdd new secret
+\t3) add\t\tAdd new secret
 \t4) delete\t\tDelete secret
 \t5) clear\t\tClear clipboard
-\t6) help\t\t\tDisplay commands
-\t7) exit\t\t\tExit application''')
+\t6) help\t\tDisplay commands
+\t7) exit\t\tExit application''')
             while True:
                 selection = input('''
 > ''')
@@ -312,19 +283,17 @@ Commands:
                     selection.lower() != 'add' and \
                     selection != '4' and \
                     selection != '5' and \
-                    selection != '6' and \
-                    selection != '7' and \
                     selection.lower() != 'clear' and \
                     selection.lower() != 'delete' and \
                     selection.lower() != 'exit' and \
                     selection.lower() != 'help':
                     print('Bad selection! Try again...')
                 elif selection == '1' or selection.lower() == 'search':
-                    entries = search()
+                    search()
                 elif selection == '2' or selection.lower() == 'decrypt':
-                    entries = decrypt(key,entries)
+                    decrypt(key)
                 elif selection == '3' or selection.lower() == 'add':
-                    entries = add(key)
+                    add(key)
                 elif selection == '4' or selection.lower() == 'delete':
                     delete()
                 elif selection == '5' or selection.lower() == 'clear':
@@ -332,13 +301,13 @@ Commands:
                 elif selection == '6' or selection.lower() == 'help':
                     print('''
 Commands:
-\t1) search\t\tSearch secrets
-\t2) decrypt\t\tDecrypt secret
-\t3) add\t\t\tAdd new secret
-\t4) delete\t\tDelete secret
-\t5) clear\t\tClear clipboard
-\t6) help\t\t\tDisplay commands
-\t7) exit\t\t\tExit application''')
+\tsearch\t\tSearch secrets
+\tdecrypt\t\tDecrypt secret
+\tadd\t\tAdd new secret
+\tdelete\t\tDelete secret
+\tclear\t\tClear clipboard
+\thelp\t\tDisplay commands
+\texit\t\tExit application''')
                 elif selection == '7' or selection.lower() == 'exit':
                     exit()
 
@@ -346,7 +315,182 @@ Commands:
             print('**Failure!** \n**Incorrect Password... Please try again.**\n')
             return
 
+# Documentation:
+#   https://flask.palletsprojects.com/en/3.0.x/
+
+import subprocess
+from http.server import HTTPServer, SimpleHTTPRequestHandler
+import os
+import sys
+from flask import Flask, render_template, render_template_string, request, jsonify, send_file, make_response
+from werkzeug.utils import secure_filename
+# import numpy as np
+import json
+import platform
+
+# WORKSAFE=False
+# try:
+#     from gevent.pywsgi import WSGIServer
+# except Exception as e:
+#     print(e)
+#     WORKSAFE=True
+def get_platform_type():
+    system = platform.system()
+    return system
+
+def run_with_switches(system):
+    # Check the default browser
+    if system == 'Darwin':
+        # Path for Google Chrome on macOS
+        chrome_path = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+        if os.path.exists(chrome_path):
+            command = [
+                chrome_path,
+                '--app=http://127.0.0.1:8001/',
+                '--disable-pinch',
+                '--disable-extensions',
+                '--guest'
+            ]
+        print("Running command:", command)
+        subprocess.Popen(command)
+        return
+    elif system == 'Linux':
+        # Typical command for launching Google Chrome on Linux
+        chrome_path = '/usr/bin/google-chrome'
+        if os.path.exists(chrome_path):
+            command = [
+                chrome_path,
+                '--app=http://127.0.0.1:8001/',
+                '--disable-pinch',
+                '--disable-extensions',
+                '--guest'
+            ]
+        else:
+            # Fallback to chromium if google-chrome is not installed
+            chromium_path = '/usr/bin/chromium-browser'
+            if os.path.exists(chromium_path):
+                command = [
+                    chromium_path,
+                    '--app=http://127.0.0.1:8001/',
+                    '--disable-pinch',
+                    '--disable-extensions',
+                    '--guest'
+                ]
+        print("Running command:", command)
+        subprocess.Popen(command)
+        return
+    else:
+        if os.path.exists("C:/Program Files/Google/Chrome/Application/chrome.exe"):
+            command = [
+                "C:/Program Files/Google/Chrome/Application/chrome.exe",
+                '--app=http://127.0.0.1:8001/',
+                '--disable-pinch',
+                '--disable-extensions',
+                '--guest'
+            ]
+            print("Running command:", command)
+            subprocess.Popen(command)
+            return
+        elif os.path.exists("C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"):
+            command = [
+                "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe",
+                '--app=http://127.0.0.1:8001/',
+                '--disable-pinch',
+                '--disable-extensions',
+                '--guest'
+            ]
+            print("Running command:", command)
+            subprocess.Popen(command)
+            return
+
+    print("Chromium-based browser not found or default browser not set.")
+
+
+def stop_previous_flask_server():
+    try:
+        # Read the PID from the file
+        with open(f'{os.path.expanduser("~")}/flask_server.pid', 'r') as f:
+            pid = int(f.read().strip())
+
+        # # Check if the Flask server process is still running
+        # while True:
+        #     if not os.path.exists(f'/proc/{pid}'):
+        #         break  # Exit the loop if the process has exited
+        #     time.sleep(1)  # Sleep for a short duration before checking again
+
+        # Terminate the Flask server process
+        command = f'taskkill /F /PID {pid}'
+        subprocess.run(command, shell=True, check=True)
+        print("Previous Flask server process terminated.")
+    except Exception as e:
+        print(f"Error stopping previous Flask server: {e}")
+
+app = Flask(__name__)
+
+
+# getting the name of the directory
+# where the this file is present.
+path = os.path.dirname(os.path.realpath(__file__))
+
+
+# Routes
+@app.route('/')
+def index():
+    # html = """
+   
+    # """
+
+    # file_path = f'{os.path.dirname(os.path.realpath(__file__))}/templates/index.html'
+
+    # with open(file_path, 'r') as file:
+    #     html = ''
+    #     for line in file:
+    #         html += line
+            
+    #     return render_template_string(html)
+        # return render('index.html')
+        return render_template('index.html')
+
+@app.route('/api/example_api_endpoint', methods=['GET'])
+def example_api_endpoint():
+    # Get the data from the request
+    # data = request.json.get('data') # for POST requests with data
+    from python_modules import python_modules
+    go_message = python_modules.main()
+
+    data = {'Go Module Message':go_message}
+
+    # Perform data processing
+
+    # Return the modified data as JSON
+    return jsonify({'result': data})
+
+@app.route('/api/authenticate', methods=['POST'])
+def authenticate():
+    password = request.json.get('password') # for POST requests with data
+
+
+def main():
+    stop_previous_flask_server()
+
+    pid_file = f'{os.path.expanduser("~")}/flask_server.pid'
+    with open(pid_file, 'w') as f:
+        f.write(str(os.getpid()))  # Write the PID to the file
+
+    # ADD SPLASH SCREEN?
+
+    # Get current system type
+    system = get_platform_type()
+
+    # Run Apped Chrome Window
+    run_with_switches(system)
+
+    # if WORKSAFE == False:
+    #     http_server = WSGIServer(("127.0.0.1", 8000), app)
+    #     http_server.serve_forever()
+    # else:
+    app.run(debug=True, threaded=True, port=8001, use_reloader=False)
 
 if __name__ == '__main__':
     main()
-
+    
